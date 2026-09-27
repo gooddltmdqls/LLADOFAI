@@ -4,7 +4,7 @@ Low-latency ASIO and WASAPI audio output for *A Dance of Fire and Ice* on Window
 
 ## Introduction
 
-**LLADOFAI** means **Low Latency A Dance of Fire and Ice**. It is a Windows audio output mod for *A Dance of Fire and Ice* that routes the game's audio to a selected ASIO driver or WASAPI device. WASAPI supports shared and exclusive modes, and both output options include an optional low-latency Unity DSP setting.
+**LLADOFAI** means **Low Latency A Dance of Fire and Ice**. It is a Windows audio output mod for *A Dance of Fire and Ice* that routes the game's audio to a selected ASIO driver or WASAPI device.
 
 ## Why LLADOFAI?
 
@@ -24,12 +24,13 @@ The included screenshots compare the in-game device offset shown for the default
 > [!NOTE]
 > ASIO output requires an ASIO driver. This is typically provided by audio interfaces with native ASIO support.
 
-1. Install Unity Mod Manager for *A Dance of Fire and Ice*, then install the LLADOFAI ZIP through Unity Mod Manager.
+> [!NOTE]
+> New to modding? Visit the guide [here](https://the-universal-forums.notion.site/Mod-info-3ca484d6071f80cf8f98c5b0337602e4)
+
+1. Install UnityModManager for *A Dance of Fire and Ice*, then install the LLADOFAI ZIP through UnityModManager.
 2. Enable LLADOFAI and open its settings. Choose either **Use ASIO** or **Use WASAPI**, then select an audio device.
 3. For WASAPI, choose shared or exclusive mode. Exclusive mode requires the selected device to differ from the Windows default output; change the default and restart the game if necessary.
 4. Click **Save settings** to apply your selection.
-
-The optional 256-frame Unity DSP setting takes effect the next time you launch the game.
 
 ## Troubleshooting
 
@@ -38,9 +39,9 @@ The optional 256-frame Unity DSP setting takes effect the next time you launch t
 
 ## Contributing
 
-Bug reports and pull requests are welcome. For audio issues, include your game and Unity Mod Manager versions, selected output mode and device, and any relevant mod log messages.
+Bug reports and pull requests are welcome. For audio issues, include your game and UnityModManager versions, selected output mode and device, and any relevant mod log messages.
 
-To build, use Visual Studio or MSBuild on Windows. The solution targets .NET Framework 4.8 and references assemblies from the ADOFAI and Unity Mod Manager game installation. Run `make_release.bat` to build and package the mod.
+To build, use Visual Studio or MSBuild on Windows. The solution targets .NET Framework 4.8 and references assemblies from the ADOFAI and UnityModManager game installation. Run `make_release.bat` to build and package the mod.
 
 ## License
 
