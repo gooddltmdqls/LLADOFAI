@@ -1,0 +1,8 @@
+{
+  "Id": "ASIOAdofai",
+  "DisplayName": "LLADOFAI",
+  "Author": "Icetang0123",
+  "Version": "1.0.0",
+  "AssemblyName": "LLADOFAI.dll",
+  "EntryMethod": "LLADOFAI.ModEntryPoint.Setup"
+}
