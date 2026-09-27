@@ -1,5 +1,7 @@
 # LLADOFAI
 
+[EN](README.md) | [KR](README_KR.md)
+
 Windows용 *A Dance of Fire and Ice* 저지연 ASIO 및 WASAPI 오디오 출력 모드입니다.
 
 ## 소개

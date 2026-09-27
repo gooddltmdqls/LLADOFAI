@@ -1,5 +1,7 @@
 # LLADOFAI
 
+[EN](README.md) | [KR](README_KR.md)
+
 Low-latency ASIO and WASAPI audio output for *A Dance of Fire and Ice* on Windows.
 
 ## Introduction
