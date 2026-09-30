@@ -216,4 +216,4 @@ The following cannot be verified without playing the game and listening. Recalib
 ## Licensing
 
 - **Code.** All FMOD backend code was written for LLADOFAI from the FMOD Core API reference, the Unity and Harmony APIs, ADOFAI's own code (decompiled for analysis only) and general audio-programming knowledge. No code from third-party ADOFAI FMOD mods was used. The code is under LLADOFAI's MIT license.
-- **FMOD runtime.** `fmod.dll` is proprietary Firelight Technologies software under the FMOD EULA and is not covered by LLADOFAI's license. Redistribution normally requires an FMOD license for the distributing product, plus attribution. `make_release.bat` therefore does **not** package `fmod.dll` unless `LLADOFAI_INCLUDE_FMOD=1` is set, which should only be done after confirming the licence terms. Users can otherwise install the runtime from the FMOD Engine download (Windows, Core API, `api/core/lib/x64/fmod.dll`).
+- **FMOD runtime.** `fmod.dll` is proprietary Firelight Technologies software.
