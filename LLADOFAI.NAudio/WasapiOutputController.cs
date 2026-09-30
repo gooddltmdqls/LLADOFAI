@@ -48,7 +48,7 @@ namespace LLADOFAI
         {
             lock (_initLock)
             {
-                if (enabled && ModEntryPoint.IsShuttingDown)
+                if (enabled && NAudioHost.IsShuttingDown)
                 {
                     return;
                 }
@@ -66,7 +66,7 @@ namespace LLADOFAI
                 {
                     DisposeDevice();
                     _error = false;
-                    _message = Localization.Get("selectWasapiRequired");
+                    _message = NAudioHost.Get("selectWasapiRequired");
                     _captureMessage = null;
                     return;
                 }
@@ -87,22 +87,22 @@ namespace LLADOFAI
             MMDeviceEnumerator enumerator = null;
             MMDevice endpoint = null;
             WasapiRenderOutput output = null;
-            string stage = Localization.Get("stageEnumerate");
+            string stage = NAudioHost.Get("stageEnumerate");
 
             try
             {
-                _message = Localization.Get("initializingWasapi");
-                _captureMessage = Localization.Get("waitingForAudioListener");
+                _message = NAudioHost.Get("initializingWasapi");
+                _captureMessage = NAudioHost.Get("waitingForAudioListener");
                 _error = false;
 
                 enumerator = new MMDeviceEnumerator();
 
-                stage = Localization.Get("stageOpenEndpoint");
+                stage = NAudioHost.Get("stageOpenEndpoint");
                 endpoint = enumerator.GetDevice(deviceId);
 
                 if (exclusiveMode)
                 {
-                    stage = Localization.Get("stageCheckDefault");
+                    stage = NAudioHost.Get("stageCheckDefault");
                     foreach (Role role in new[] { Role.Multimedia, Role.Console })
                     {
                         MMDevice defaultEndpoint = null;
@@ -113,7 +113,7 @@ namespace LLADOFAI
                             if (defaultEndpoint.ID == deviceId)
                             {
                                 throw new InvalidOperationException(
-                                    Localization.Get("exclusiveEndpointIsDefault"));
+                                    NAudioHost.Get("exclusiveEndpointIsDefault"));
                             }
                         }
                         finally
@@ -123,7 +123,7 @@ namespace LLADOFAI
                     }
                 }
 
-                stage = Localization.Get("stageReadUnity");
+                stage = NAudioHost.Get("stageReadUnity");
                 int channels = GetChannelCount(AudioSettings.speakerMode);
                 int sampleRate = AudioSettings.outputSampleRate;
                 int dspBufferLength;
@@ -134,11 +134,11 @@ namespace LLADOFAI
                     dspBufferLength,
                     Math.Min(unityBufferFrames, sampleRate / 100));
 
-                stage = Localization.Get("stageCreateBridge");
+                stage = NAudioHost.Get("stageCreateBridge");
                 AudioOutputBridge bridge = new AudioOutputBridge(sampleRate, channels, minimumBufferedFrames);
 
-                stage = Localization.Format("stageCreateOutput",
-                    Localization.Get(exclusiveMode ? "wasapiExclusiveMode" : "wasapiSharedMode"));
+                stage = NAudioHost.Format("stageCreateOutput",
+                    NAudioHost.Get(exclusiveMode ? "wasapiExclusiveMode" : "wasapiSharedMode"));
                 bool useEventSync = !exclusiveMode;
                 output = new WasapiRenderOutput(
                     endpoint,
@@ -149,17 +149,17 @@ namespace LLADOFAI
 
                 WaveFormat mixFormat = output.MixFormat;
                 WaveFormat streamFormat = output.OutputFormat;
-                ModEntryPoint.Logger.Log(
+                NAudioHost.Log(
                     $"WASAPI {(exclusiveMode ? "exclusive" : "shared")} endpoint " +
                     $"'{endpoint.FriendlyName}' ({endpoint.ID}) mix format: {mixFormat}; " +
                     $"selected stream format: {streamFormat} ({output.OutputFormatSelectionDetails}); " +
                     $"Unity source format: {bridge.WaveFormat}.");
 
-                stage = Localization.Format("stageAdaptFormat", streamFormat);
+                stage = NAudioHost.Format("stageAdaptFormat", streamFormat);
                 WasapiMixFormatWaveProvider wasapiProvider =
                     new WasapiMixFormatWaveProvider(bridge, streamFormat);
 
-                stage = Localization.Format("stageInitNative", wasapiProvider.WaveFormat);
+                stage = NAudioHost.Format("stageInitNative", wasapiProvider.WaveFormat);
                 Exception eventFailure = null;
                 try
                 {
@@ -177,7 +177,7 @@ namespace LLADOFAI
                     int alignedFrames = output.AlignedBufferFrameCount;
                     long alignedDuration = (long)Math.Round(
                         alignedFrames * 10000000.0 / streamFormat.SampleRate);
-                    ModEntryPoint.Logger.Log(
+                    NAudioHost.Log(
                         $"WASAPI exclusive event buffer aligned to {alignedFrames} frames; " +
                         $"retrying with {alignedDuration} reference-time units.");
                     output.Dispose();
@@ -206,7 +206,7 @@ namespace LLADOFAI
                     (eventFailure.HResult == UnsupportedFormat ||
                     eventFailure.HResult == EndpointCreateFailed))
                 {
-                    ModEntryPoint.Logger.Log(
+                    NAudioHost.Log(
                         $"WASAPI exclusive Initialize rejected {output.OutputFormat} " +
                         $"(HRESULT 0x{eventFailure.HResult:X8}); trying another supported format.");
                     output.Dispose();
@@ -231,11 +231,11 @@ namespace LLADOFAI
 
                     mixFormat = output.MixFormat;
                     streamFormat = output.OutputFormat;
-                    ModEntryPoint.Logger.Log(
+                    NAudioHost.Log(
                         $"WASAPI exclusive retry format: {streamFormat} " +
                         $"({output.OutputFormatSelectionDetails}).");
                     wasapiProvider = new WasapiMixFormatWaveProvider(bridge, streamFormat);
-                    stage = Localization.Format("stageRetryExclusive", streamFormat);
+                    stage = NAudioHost.Format("stageRetryExclusive", streamFormat);
                     eventFailure = null;
                     try
                     {
@@ -256,7 +256,7 @@ namespace LLADOFAI
                         throw eventFailure;
                     }
 
-                    ModEntryPoint.Logger.Log(
+                    NAudioHost.Log(
                         $"WASAPI {(exclusiveMode ? "exclusive" : "shared")} initialization with " +
                         "event synchronization failed; retrying with polling " +
                         $"({eventFailure.GetType().FullName}, " +
@@ -270,12 +270,12 @@ namespace LLADOFAI
                         bridge.WaveFormat);
                     mixFormat = output.MixFormat;
                     streamFormat = output.OutputFormat;
-                    ModEntryPoint.Logger.Log(
+                    NAudioHost.Log(
                         $"WASAPI {(exclusiveMode ? "exclusive" : "shared")} polling retry uses " +
                         $"mix format {mixFormat} and stream format {streamFormat} " +
                         $"({output.OutputFormatSelectionDetails}).");
                     wasapiProvider = new WasapiMixFormatWaveProvider(bridge, streamFormat);
-                    stage = Localization.Format("stagePolling", wasapiProvider.WaveFormat);
+                    stage = NAudioHost.Format("stagePolling", wasapiProvider.WaveFormat);
                     output.Initialize(wasapiProvider);
                 }
 
@@ -299,7 +299,7 @@ namespace LLADOFAI
                 bridge.SetMinimumBufferedFrames(startupBufferFrames);
                 bridge.SetSteadyStateBufferedFrames(
                     Math.Min(startupBufferFrames, steadyStateBufferFrames));
-                ModEntryPoint.Logger.Log(
+                NAudioHost.Log(
                     $"WASAPI bridge buffer: {startupBufferFrames} frames at startup " +
                     $"({startupBufferFrames * 1000.0 / sampleRate:F1} ms), " +
                     $"{steadyStateBufferFrames} frames after stabilization " +
@@ -317,18 +317,18 @@ namespace LLADOFAI
                 _currentDeviceId = deviceId;
                 _currentExclusiveMode = exclusiveMode;
 
-                _message = Localization.Format("wasapiInitialized",
-                    Localization.Get(exclusiveMode ? "wasapiExclusiveMode" : "wasapiSharedMode"),
+                _message = NAudioHost.Format("wasapiInitialized",
+                    NAudioHost.Get(exclusiveMode ? "wasapiExclusiveMode" : "wasapiSharedMode"),
                     endpoint.FriendlyName);
                 _error = false;
 
-                stage = Localization.Get("stageStartPlayback");
+                stage = NAudioHost.Get("stageStartPlayback");
                 output.Start();
 
                 output = null;
                 endpoint = null;
 
-                ModEntryPoint.Logger.Log(_message);
+                NAudioHost.Log(_message);
             }
             catch (Exception ex)
             {
@@ -360,24 +360,24 @@ namespace LLADOFAI
                 }
 
                 string errorText = string.IsNullOrWhiteSpace(ex.Message)
-                    ? Localization.Get("emptyDriverError")
+                    ? NAudioHost.Get("emptyDriverError")
                     : ex.Message;
                 if (exclusiveMode && ex.HResult == DeviceInUse)
                 {
-                    errorText = Localization.Get("exclusiveEndpointInUse");
+                    errorText = NAudioHost.Get("exclusiveEndpointInUse");
                 }
                 else if (exclusiveMode && ex.HResult == ExclusiveModeNotAllowed)
                 {
-                    errorText = Localization.Get("exclusiveNotAllowed");
+                    errorText = NAudioHost.Get("exclusiveNotAllowed");
                 }
                 string endpointDescription = endpoint == null
-                    ? Localization.Get("selectedEndpoint")
+                    ? NAudioHost.Get("selectedEndpoint")
                     : $"'{endpoint.FriendlyName}' ({endpoint.ID})";
-                _message = Localization.Format("wasapiInitFailed",
+                _message = NAudioHost.Format("wasapiInitFailed",
                     endpointDescription, stage, ex.GetType().FullName,
                     $"0x{ex.HResult:X8}", errorText);
                 _error = true;
-                ModEntryPoint.Logger.Error(_message + Environment.NewLine + ex);
+                NAudioHost.Error(_message + Environment.NewLine + ex);
             }
             finally
             {
@@ -387,7 +387,7 @@ namespace LLADOFAI
                 }
                 catch (Exception ex)
                 {
-                    ModEntryPoint.Logger.Error("Error while releasing the WASAPI endpoint: " + ex);
+                    NAudioHost.Error("Error while releasing the WASAPI endpoint: " + ex);
                 }
 
                 try
@@ -396,7 +396,7 @@ namespace LLADOFAI
                 }
                 catch (Exception ex)
                 {
-                    ModEntryPoint.Logger.Error("Error while releasing the WASAPI enumerator: " + ex);
+                    NAudioHost.Error("Error while releasing the WASAPI enumerator: " + ex);
                 }
             }
         }
@@ -409,9 +409,9 @@ namespace LLADOFAI
                 return;
             }
 
-            _message = Localization.Format("wasapiPlaybackStopped", exception.Message);
+            _message = NAudioHost.Format("wasapiPlaybackStopped", exception.Message);
             _error = true;
-            _captureMessage = Localization.Get("wasapiOutputStopped");
+            _captureMessage = NAudioHost.Get("wasapiOutputStopped");
         }
 
         private static bool IsPlaying(WasapiRenderOutput output)
@@ -445,7 +445,7 @@ namespace LLADOFAI
                 }
                 catch (Exception ex)
                 {
-                    ModEntryPoint.Logger.Error("Error while stopping WASAPI output: " + ex.Message);
+                    NAudioHost.Error("Error while stopping WASAPI output: " + ex.Message);
                 }
 
                 try
@@ -454,7 +454,7 @@ namespace LLADOFAI
                 }
                 catch (Exception ex)
                 {
-                    ModEntryPoint.Logger.Error("Error while disposing WASAPI output: " + ex.Message);
+                    NAudioHost.Error("Error while disposing WASAPI output: " + ex.Message);
                 }
             }
 
@@ -464,7 +464,7 @@ namespace LLADOFAI
             }
             catch (Exception ex)
             {
-                ModEntryPoint.Logger.Error("Error while disposing the WASAPI endpoint: " + ex.Message);
+                NAudioHost.Error("Error while disposing the WASAPI endpoint: " + ex.Message);
             }
         }
 

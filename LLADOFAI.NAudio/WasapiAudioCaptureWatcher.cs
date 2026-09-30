@@ -27,8 +27,8 @@ namespace LLADOFAI
 
         private void LateUpdate()
         {
-            if (!ModEntryPoint.IsEnabled || ModConfiguration.instance == null ||
-                !ModConfiguration.instance.wasapiEnabled)
+            if (!NAudioHost.IsEnabled || NAudioHost.Configuration == null ||
+                !NAudioHost.Configuration.wasapiEnabled)
             {
                 StopCapture();
                 WasapiOutputController.SetCaptureMessage(null);
@@ -119,7 +119,7 @@ namespace LLADOFAI
 
         private void OnDestroy()
         {
-            if (ModEntryPoint.IsShuttingDown)
+            if (NAudioHost.IsShuttingDown)
             {
                 if (_captureListener != null)
                 {
@@ -136,12 +136,12 @@ namespace LLADOFAI
 
         private void OnApplicationQuit()
         {
-            if (ModEntryPoint.IsShuttingDown)
+            if (NAudioHost.IsShuttingDown)
             {
                 return;
             }
 
-            ModEntryPoint.IsShuttingDown = true;
+            NAudioHost.IsShuttingDown = true;
 
             if (_captureListener != null)
             {

@@ -34,6 +34,10 @@ The included screenshots compare the in-game device offset shown for the default
 3. For WASAPI, choose shared or exclusive mode. Exclusive mode requires the selected device to differ from the Windows default output; change the default and restart the game if necessary.
 4. Click **Save settings** to apply your selection.
 
+## Experimental FMOD engine
+
+LLADOFAI also includes an experimental FMOD audio engine, selectable under **Audio engine** in the mod settings. Instead of capturing Unity's output, it plays the game's sounds directly through FMOD on a WASAPI or ASIO device. It needs the 64-bit FMOD Core 2.03 runtime (`fmod.dll`), which is not included; place it in the mod folder. NAudio stays the default. See [FMOD_ENGINE.md](FMOD_ENGINE.md) for details, limitations and licensing.
+
 ## Troubleshooting
 
 - If audio crackles, drops out, or underruns, increase the audio buffer size in ADOFAI's audio settings.

@@ -1,4 +1,4 @@
-﻿using NAudio.Wave;
+using NAudio.Wave;
 using System.Collections.Generic;
 
 namespace LLADOFAI
@@ -7,13 +7,13 @@ namespace LLADOFAI
     {
         private static readonly List<string> _drivers = new List<string>();
 
-        internal void LoadAsioDrivers()
+        public void LoadAsioDrivers()
         {
             _drivers.Clear();
 
             string[] asioDriverNames = AsioOut.GetDriverNames();
 
-            ModEntryPoint.Logger.Log($"Found {asioDriverNames.Length} ASIO drivers: {string.Join(", ", asioDriverNames)}");
+            NAudioHost.Log($"Found {asioDriverNames.Length} ASIO drivers: {string.Join(", ", asioDriverNames)}");
 
             foreach (string name in asioDriverNames)
             {

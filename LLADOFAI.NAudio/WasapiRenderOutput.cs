@@ -197,7 +197,7 @@ namespace LLADOFAI
             // through the already activated NAudio IAudioClient instead.
             byte[] serializedFormat = SerializeFormat(waveFormat);
             int formatLength = serializedFormat.Length - sizeof(int);
-            ModEntryPoint.Logger?.Log("WASAPI native Initialize: " + formatLength +
+            NAudioHost.Log?.Invoke("WASAPI native Initialize: " + formatLength +
                 " format bytes, mode " + shareMode + ", flags " + streamFlags +
                 ", duration " + bufferDuration + ", periodicity " + periodicity + ".");
 
@@ -209,7 +209,7 @@ namespace LLADOFAI
                 Marshal.Copy(serializedFormat, sizeof(int), formatPointer, formatLength);
 
                 clientPointer = GetNativeClientPointer(audioClient);
-                ModEntryPoint.Logger?.Log("WASAPI native IAudioClient pointer acquired.");
+                NAudioHost.Log?.Invoke("WASAPI native IAudioClient pointer acquired.");
 
                 IntPtr vtable = Marshal.ReadIntPtr(clientPointer);
                 IntPtr initializeMethod = Marshal.ReadIntPtr(vtable, 3 * IntPtr.Size);
@@ -226,7 +226,7 @@ namespace LLADOFAI
                     periodicity,
                     formatPointer,
                     ref sessionId);
-                ModEntryPoint.Logger?.Log("WASAPI native Initialize returned HRESULT 0x" +
+                NAudioHost.Log?.Invoke("WASAPI native Initialize returned HRESULT 0x" +
                     result.ToString("X8") + ".");
                 Marshal.ThrowExceptionForHR(result);
             }
@@ -433,7 +433,7 @@ namespace LLADOFAI
                     mmcssHandle = AvSetMmThreadCharacteristics(taskName, ref taskIndex);
                     if (mmcssHandle == IntPtr.Zero)
                     {
-                        ModEntryPoint.Logger?.Log("WASAPI renderer could not join the " +
+                        NAudioHost.Log?.Invoke("WASAPI renderer could not join the " +
                             taskName + " scheduler task.");
                     }
                 }

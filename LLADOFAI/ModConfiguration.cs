@@ -6,7 +6,7 @@ using UnityModManagerNet;
 namespace LLADOFAI
 {
     [XmlRoot("Configuration")]
-    public class ModConfiguration : UnityModManager.ModSettings
+    public class ModConfiguration : UnityModManager.ModSettings, INAudioConfiguration
     {
         [NonSerialized]
         public static ModConfiguration instance;
@@ -21,6 +21,16 @@ namespace LLADOFAI
         public bool wasapiLowLatencyDsp = false;
         public string language = "auto";
         public bool showStatistics = false;
+        public string audioEngine = "naudio";
+        public string fmodOutput = "wasapi";
+        public string fmodDeviceId = null;
+        public int fmodDspBufferFrames = 512;
+        public int fmodDspBufferCount = 3;
+
+        bool INAudioConfiguration.asioEnabled => asioEnabled;
+        bool INAudioConfiguration.wasapiEnabled => wasapiEnabled;
+        int INAudioConfiguration.asioQueueSafetyMilliseconds => asioQueueSafetyMilliseconds;
+        string INAudioConfiguration.audioDeviceName => audioDeviceName;
 
         public override void Save(UnityModManager.ModEntry modEntry)
         {

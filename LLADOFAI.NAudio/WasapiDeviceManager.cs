@@ -35,7 +35,7 @@ namespace LLADOFAI
                     }
                     catch (Exception ex)
                     {
-                        ModEntryPoint.Logger.Log("Unable to get the default WASAPI output device: " + ex.Message);
+                        NAudioHost.Log("Unable to get the default WASAPI output device: " + ex.Message);
                     }
 
                     MMDeviceCollection endpoints = enumerator.EnumerateAudioEndPoints(
@@ -51,12 +51,12 @@ namespace LLADOFAI
                     }
                 }
 
-                ModEntryPoint.Logger.Log($"Found {_devices.Count} active WASAPI output devices.");
+                NAudioHost.Log($"Found {_devices.Count} active WASAPI output devices.");
             }
             catch (Exception ex)
             {
                 _devices.Clear();
-                ModEntryPoint.Logger.Error("Unable to enumerate WASAPI output devices: " + ex.Message);
+                NAudioHost.Error("Unable to enumerate WASAPI output devices: " + ex.Message);
             }
         }
     }

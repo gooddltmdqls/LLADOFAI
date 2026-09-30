@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>disable</Nullable>
+    <RootNamespace>LLADOFAI.Fmod</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\LLADOFAI.Fmod\FmodNative.cs" Link="FmodNative.cs" />
+    <Compile Include="..\..\LLADOFAI.Fmod\FmodClock.cs" Link="FmodClock.cs" />
+    <Compile Include="..\..\LLADOFAI.Fmod\FmodStaThread.cs" Link="FmodStaThread.cs" />
+    <Compile Include="..\..\LLADOFAI.Fmod\FmodAssetAudio.cs" Link="FmodAssetAudio.cs" />
+    <None Include="..\..\packages\fmod.dll" Link="fmod.dll" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\..\packages\fmod.dll')" />
+  </ItemGroup>
+</Project>

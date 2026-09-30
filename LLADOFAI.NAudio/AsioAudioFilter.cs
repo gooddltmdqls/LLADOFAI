@@ -16,7 +16,7 @@ namespace LLADOFAI
 
         private void Awake()
         {
-            ModConfiguration configuration = ModConfiguration.instance;
+            INAudioConfiguration configuration = NAudioHost.Configuration;
             if (configuration != null && configuration.asioEnabled)
             {
                 SetDevice(true, configuration.audioDeviceName);
@@ -25,15 +25,15 @@ namespace LLADOFAI
 
         private void OnAudioFilterRead(float[] data, int channels)
         {
-            if (ModEntryPoint.IsShuttingDown)
+            if (NAudioHost.IsShuttingDown)
             {
                 return;
             }
 
             AudioOutputBridge bridge = Bridge;
-            ModConfiguration configuration = ModConfiguration.instance;
+            INAudioConfiguration configuration = NAudioHost.Configuration;
 
-            if (!ModEntryPoint.IsEnabled || bridge == null || data == null || data.Length == 0 ||
+            if (!NAudioHost.IsEnabled || bridge == null || data == null || data.Length == 0 ||
                 configuration == null || !configuration.asioEnabled)
             {
                 return;
@@ -54,7 +54,7 @@ namespace LLADOFAI
 
         public static void UpdateDevice(string newDeviceName)
         {
-            ModConfiguration configuration = ModConfiguration.instance;
+            INAudioConfiguration configuration = NAudioHost.Configuration;
             SetDevice(configuration != null && configuration.asioEnabled, newDeviceName);
         }
 
@@ -83,8 +83,8 @@ namespace LLADOFAI
                 catch (Exception ex)
                 {
                     Error = true;
-                    Message = Localization.Format("openAsioPanelError", ex.Message);
-                    ModEntryPoint.Logger.Error(Message);
+                    Message = NAudioHost.Format("openAsioPanelError", ex.Message);
+                    NAudioHost.Error(Message);
                     return false;
                 }
             }
@@ -94,7 +94,7 @@ namespace LLADOFAI
         {
             lock (_initLock)
             {
-                if (enabled && ModEntryPoint.IsShuttingDown)
+                if (enabled && NAudioHost.IsShuttingDown)
                 {
                     return;
                 }
@@ -111,7 +111,7 @@ namespace LLADOFAI
                 {
                     DisposeDevice();
                     Error = false;
-                    Message = Localization.Get("selectAsioRequired");
+                    Message = NAudioHost.Get("selectAsioRequired");
                     return;
                 }
 
@@ -131,7 +131,7 @@ namespace LLADOFAI
 
             try
             {
-                Message = Localization.Format("initializingAsio", deviceName);
+                Message = NAudioHost.Format("initializingAsio", deviceName);
 
                 device = new AsioOut(deviceName);
                 int channels = GetChannelCount(AudioSettings.speakerMode);
@@ -140,7 +140,7 @@ namespace LLADOFAI
                 int dspBufferCount;
                 AudioSettings.GetDSPBufferSize(out dspBufferLength, out dspBufferCount);
                 int safetyMilliseconds = Math.Max(0, Math.Min(40,
-                    ModConfiguration.instance?.asioQueueSafetyMilliseconds ?? 10));
+                    NAudioHost.Configuration?.asioQueueSafetyMilliseconds ?? 10));
                 // Keep one fixed latency target for rhythm-game calibration.
                 // The clocks still need resampling, but underruns must not move
                 // the target during a song.
@@ -152,7 +152,7 @@ namespace LLADOFAI
                     Math.Max(dspBufferLength, dspBufferLength +
                         device.FramesPerBuffer + sampleRate * safetyMilliseconds / 1000));
                 bridge.SetMinimumBufferedFrames(fixedQueueFrames);
-                ModEntryPoint.Logger.Log($"ASIO fixed queue target: {fixedQueueFrames} frames " +
+                NAudioHost.Log($"ASIO fixed queue target: {fixedQueueFrames} frames " +
                     $"({fixedQueueFrames * 1000.0 / sampleRate:F1} ms); " +
                     $"Unity block: {dspBufferLength} frames; " +
                     $"ASIO callback: {device.FramesPerBuffer} frames; " +
@@ -167,7 +167,7 @@ namespace LLADOFAI
                 Error = false;
                 Message = null;
 
-                ModEntryPoint.Logger.Log("Initialized ASIO Driver.");
+                NAudioHost.Log("Initialized ASIO Driver.");
             }
             catch (Exception ex)
             {
@@ -192,8 +192,8 @@ namespace LLADOFAI
                 Bridge = null;
                 _currentDeviceName = "";
                 Error = true;
-                Message = Localization.Format("initializeAsioError", deviceName, ex.Message);
-                ModEntryPoint.Logger.Error(Message);
+                Message = NAudioHost.Format("initializeAsioError", deviceName, ex.Message);
+                NAudioHost.Error(Message);
             }
         }
 
@@ -216,7 +216,7 @@ namespace LLADOFAI
             }
             catch (Exception ex)
             {
-                ModEntryPoint.Logger.Error($"Error while stopping ASIO device: {ex.Message}");
+                NAudioHost.Error($"Error while stopping ASIO device: {ex.Message}");
             }
 
             try
@@ -225,7 +225,7 @@ namespace LLADOFAI
             }
             catch (Exception ex)
             {
-                ModEntryPoint.Logger.Error($"Error while disposing ASIO device: {ex.Message}");
+                NAudioHost.Error($"Error while disposing ASIO device: {ex.Message}");
             }
         }
 

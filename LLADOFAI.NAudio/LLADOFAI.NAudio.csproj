@@ -1,14 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{17982E07-2C1F-4574-B07B-7976D8676ADA}</ProjectGuid>
+    <ProjectGuid>{B027AA57-9A43-4D1F-9501-FEE9A0192B39}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LLADOFAI</RootNamespace>
-    <AssemblyName>LLADOFAI</AssemblyName>
+    <AssemblyName>LLADOFAI.NAudio</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -34,34 +34,12 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ModConfiguration.cs" />
-    <Compile Include="Localization.cs" />
-    <None Include="app.config" />
-    <Compile Include="ModEntryPoint.cs" />
-    <Compile Include="FmodEngineHost.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\LLADOFAI.NAudio\LLADOFAI.NAudio.csproj">
-      <Project>{B027AA57-9A43-4D1F-9501-FEE9A0192B39}</Project>
-      <Name>LLADOFAI.NAudio</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LLADOFAI.Fmod\LLADOFAI.Fmod.csproj">
-      <Project>{B349D415-1C2F-44C1-AC6D-B49FABAB1A92}</Project>
-      <Name>LLADOFAI.Fmod</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.3.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice\A Dance of Fire and Ice_Data\Managed\UnityModManager\0Harmony.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice\A Dance of Fire and Ice_Data\Managed\Assembly-CSharp.dll</HintPath>
-    </Reference>
     <Reference Include="NAudio.Asio, Version=2.4.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
       <HintPath>..\packages\NAudio.Asio.2.4.0\lib\netstandard2.0\NAudio.Asio.dll</HintPath>
     </Reference>
@@ -102,10 +80,20 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice\A Dance of Fire and Ice_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
-    <Reference Include="UnityModManager, Version=0.32.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice\A Dance of Fire and Ice_Data\Managed\UnityModManager\UnityModManager.dll</HintPath>
-    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="NAudioHost.cs" />
+    <Compile Include="AudioOutputBridge.cs" />
+    <Compile Include="AsioAudioFilter.cs" />
+    <Compile Include="AsioDriverManager.cs" />
+    <Compile Include="AsioAudioCaptureWatcher.cs" />
+    <Compile Include="WasapiDeviceManager.cs" />
+    <Compile Include="WasapiDeviceInfo.cs" />
+    <Compile Include="WasapiOutputController.cs" />
+    <Compile Include="WasapiMixFormatWaveProvider.cs" />
+    <Compile Include="WasapiRenderOutput.cs" />
+    <Compile Include="WasapiAudioFilter.cs" />
+    <Compile Include="WasapiAudioCaptureWatcher.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -16,8 +16,8 @@ namespace LLADOFAI
         public static ModConfiguration modConfiguration;
         public static UnityModManager.ModEntry.ModLogger Logger;
         public static Harmony harmony;
-        public static bool IsEnabled = false;
-        public static volatile bool IsShuttingDown = false;
+        public static bool IsEnabled { get => NAudioHost.IsEnabled; set => NAudioHost.IsEnabled = value; }
+        public static bool IsShuttingDown { get => NAudioHost.IsShuttingDown; set => NAudioHost.IsShuttingDown = value; }
         public static bool ASIODriverChanged = false;
         public static bool UseASIOChanged = false;
         public static bool WASAPIDeviceChanged = false;
@@ -35,6 +35,8 @@ namespace LLADOFAI
         private static double _outputFramesPerSecond;
         private static double _maximumFeedGapMilliseconds;
         private static double _maximumReadGapMilliseconds;
+        // Engine selected when the mod was enabled; switching needs a game restart.
+        private static string _runningEngine = "naudio";
 
         public static void Setup(UnityModManager.ModEntry modEntry)
         {
@@ -43,6 +45,11 @@ namespace LLADOFAI
             asioManager = new AsioDriverManager();
             wasapiManager = new WasapiDeviceManager();
             modConfiguration = ModConfiguration.Load<ModConfiguration>(modEntry);
+            NAudioHost.Configuration = modConfiguration;
+            NAudioHost.Log = Logger.Log;
+            NAudioHost.Error = Logger.Error;
+            NAudioHost.Get = Localization.Get;
+            NAudioHost.Formatter = Localization.Format;
 
             if (modConfiguration.asioEnabled && modConfiguration.wasapiEnabled)
             {
@@ -152,6 +159,16 @@ namespace LLADOFAI
                 // to game objects containing both an AudioSource and AudioListener.
                 RemoveCaptureFilters();
 
+                if (modConfiguration.audioEngine == "fmod")
+                {
+                    _runningEngine = "fmod";
+                    FmodEngineHost.Enable(modEntry, modConfiguration);
+                    Logger.Log("Enabled!");
+                    return true;
+                }
+
+                _runningEngine = "naudio";
+
                 harmony = new Harmony(modEntry.Info.Id);
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 
@@ -172,6 +189,7 @@ namespace LLADOFAI
             }
             else
             {
+                FmodEngineHost.Disable();
                 // Stop the watcher first so it cannot add another capture filter
                 // while the existing listener filters are being removed.
                 GameObject captureObject = _asioObj;
@@ -376,6 +394,28 @@ namespace LLADOFAI
                     : "auto";
             }
             GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(Localization.Get("audioEngine") + ": ", GUILayout.Width(100));
+            int engineIndex = modConfiguration.audioEngine == "fmod" ? 1 : 0;
+            int selectedEngine = GUILayout.Toolbar(engineIndex,
+                new[] { Localization.Get("engineNaudio"), Localization.Get("engineFmod") }, GUILayout.Width(330));
+            if (selectedEngine != engineIndex)
+            {
+                modConfiguration.audioEngine = selectedEngine == 1 ? "fmod" : "naudio";
+            }
+            GUILayout.EndHorizontal();
+
+            if (IsEnabled && modConfiguration.audioEngine != _runningEngine)
+            {
+                GUILayout.Label(Localization.Get("engineRestart"));
+            }
+
+            if (modConfiguration.audioEngine == "fmod")
+            {
+                FmodEngineHost.OnGUI(modEntry, modConfiguration);
+                return;
+            }
 
             GUILayout.BeginHorizontal();
             bool useASIO = GUILayout.Toggle(
@@ -689,8 +729,8 @@ namespace LLADOFAI
 
             modConfiguration.Save(modEntry);
 
-            if (ASIODriverChanged || UseASIOChanged || WASAPIDeviceChanged ||
-                WASAPIModeChanged || UseWASAPIChanged)
+            if (_runningEngine == "naudio" && (ASIODriverChanged || UseASIOChanged || WASAPIDeviceChanged ||
+                WASAPIModeChanged || UseWASAPIChanged))
             {
                 if (IsEnabled)
                 {

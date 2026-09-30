@@ -30,8 +30,8 @@ namespace LLADOFAI
 
         private void LateUpdate()
         {
-            if (!ModEntryPoint.IsEnabled || ModConfiguration.instance == null ||
-                !ModConfiguration.instance.asioEnabled ||
+            if (!NAudioHost.IsEnabled || NAudioHost.Configuration == null ||
+                !NAudioHost.Configuration.asioEnabled ||
                 AsioAudioFilter.AsioDevice == null || AsioAudioFilter.Bridge == null)
             {
                 StopCapture();
@@ -113,7 +113,7 @@ namespace LLADOFAI
 
         private void OnDestroy()
         {
-            if (ModEntryPoint.IsShuttingDown)
+            if (NAudioHost.IsShuttingDown)
             {
                 if (_captureListener != null)
                 {
@@ -130,14 +130,14 @@ namespace LLADOFAI
 
         private void OnApplicationQuit()
         {
-            if (ModEntryPoint.IsShuttingDown)
+            if (NAudioHost.IsShuttingDown)
             {
                 return;
             }
 
             // Stop capture before releasing the ASIO driver. Do not restore the
             // game's listener during shutdown; Unity is tearing down its audio graph.
-            ModEntryPoint.IsShuttingDown = true;
+            NAudioHost.IsShuttingDown = true;
 
             if (_captureListener != null)
             {

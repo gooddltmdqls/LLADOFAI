@@ -6,6 +6,12 @@ mkdir LLADOFAI
 copy ..\images\asio_logo.png LLADOFAI
 copy ..\Info.json LLADOFAI
 copy ..\LLADOFAI\bin\Release\LLADOFAI.dll LLADOFAI
+copy ..\LLADOFAI.NAudio\bin\Release\LLADOFAI.NAudio.dll LLADOFAI
+copy ..\LLADOFAI.Fmod\bin\Release\LLADOFAI.Fmod.dll LLADOFAI
+rem The FMOD Core runtime (fmod.dll) is licensed by Firelight Technologies and is
+rem not redistributed by default. Set LLADOFAI_INCLUDE_FMOD=1 only after confirming
+rem that your FMOD licence allows redistributing it with this mod (see FMOD_ENGINE.md).
+if "%LLADOFAI_INCLUDE_FMOD%"=="1" copy ..\packages\fmod.dll LLADOFAI
 copy ..\packages\Microsoft.Win32.Registry.4.7.0\lib\net461\Microsoft.Win32.Registry.dll LLADOFAI
 copy ..\LLADOFAI\bin\Release\NAudio.Core.dll LLADOFAI
 copy ..\LLADOFAI\bin\Release\NAudio.Asio.dll LLADOFAI

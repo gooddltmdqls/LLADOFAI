@@ -11,15 +11,15 @@ namespace LLADOFAI
 
         private void OnAudioFilterRead(float[] data, int channels)
         {
-            if (ModEntryPoint.IsShuttingDown)
+            if (NAudioHost.IsShuttingDown)
             {
                 return;
             }
 
             AudioOutputBridge bridge = WasapiOutputController.Bridge;
-            ModConfiguration configuration = ModConfiguration.instance;
+            INAudioConfiguration configuration = NAudioHost.Configuration;
 
-            if (!ModEntryPoint.IsEnabled || bridge == null || data == null || data.Length == 0 ||
+            if (!NAudioHost.IsEnabled || bridge == null || data == null || data.Length == 0 ||
                 configuration == null || !configuration.wasapiEnabled)
             {
                 return;
@@ -30,7 +30,7 @@ namespace LLADOFAI
                 if (Interlocked.Exchange(ref _hasReportedChannelMismatch, 1) == 0)
                 {
                     WasapiOutputController.SetCaptureMessage(
-                        Localization.Format("captureChannelMismatch",
+                        NAudioHost.Format("captureChannelMismatch",
                             channels, bridge.WaveFormat.Channels));
                 }
 
@@ -39,9 +39,9 @@ namespace LLADOFAI
 
             Interlocked.Exchange(ref _hasReportedChannelMismatch, 0);
             if (Interlocked.Exchange(ref _hasReceivedAudio, 1) == 0 ||
-                WasapiOutputController.CaptureMessage != Localization.Get("captureConnected"))
+                WasapiOutputController.CaptureMessage != NAudioHost.Get("captureConnected"))
             {
-                WasapiOutputController.SetCaptureMessage(Localization.Get("captureConnected"));
+                WasapiOutputController.SetCaptureMessage(NAudioHost.Get("captureConnected"));
             }
 
             bridge.FeedBuffer(data);
